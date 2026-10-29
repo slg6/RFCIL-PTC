@@ -1,0 +1,6 @@
+data/*
+**/__pycache__
+logs/*
+figure/iCIFAR/*
+run/*
+convs/models/pre-trained_model.bin/*
