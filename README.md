@@ -4,13 +4,7 @@ Class-incremental learning on pre-trained encrypted traffic classifiers. RFCIL-P
 
 ## Overview
 
-Traffic-classification models deployed in the wild must periodically absorb new application/protocol classes. Re-training the whole model from scratch is expensive and destroys previously acquired knowledge. RFCIL-PTC addresses this with a **rehearsal-based, adapter-style class-incremental learning** scheme on top of a frozen pre-trained traffic Transformer:
-
-- **Frozen backbone:** the ET-Bert-style traffic Transformer is frozen after pre-training; only small adapter layers are trainable, keeping storage and compute overhead low.
-- **Network expansion per task:** each incremental task adds a new group of adapter layers together with a dedicated classification head, while all previous groups are frozen.
-- **Parallel inference:** at test time all task-specific heads produce logits in parallel and the maximum logit wins, so no task identifier is needed.
-- **Prototype classification head:** after training, each head's classifier weights are replaced with class-mean feature prototypes (SimpleCIL-style), which improves stability on old classes.
-- **Composite objective:** training minimizes (i) cross-entropy on new-class samples, (ii) a KL-divergence loss that pushes old-class samples toward a uniform distribution over the new head (suppressing false positives), and (iii) an orthogonality loss that decorrelates class-center features so that classes stay separated across tasks.
+Traffic-classification models deployed in the wild must periodically absorb new application/protocol classes. Re-training the whole model from scratch is expensive and destroys previously acquired knowledge. RFCIL-PTC addresses this with a **rehearsal-based, adapter-style class-incremental learning** scheme on top of a frozen pre-trained traffic Transformer.
 
 ## Repository structure
 
@@ -44,15 +38,10 @@ Install the dependencies with:
 pip install -r re.txt
 ```
 
-Key dependencies: PyTorch 2.0.1, torchvision 0.15.1, scapy 2.5.0, flowcontainer 7.2, scikit-learn 1.3.1, numpy, pandas, tqdm, sentencepiece.
-
-A CUDA-capable GPU is recommended. Set the visible device in `main.py` (`CUDA_VISIBLE_DEVICES`).
 
 ## Data preparation
 
-The traffic datasets follow the ET-Bert preprocessing pipeline (raw PCAP -> per-flow packet-byte token sequences). Please refer to the [ET-Bert repository](https://github.com/linwhitehat/ET-BERT) for the dataset format and pre-processing scripts, and to the UER-py data utilities under `convs/uer/utils/` for vocabulary and corpus handling. The traffic vocabulary used by the backbone is provided in `convs/vocab_gen/vocab_packet_4chars_all.txt`.
-
-> The default config (`exps/adapter_one_feature.json`) still lists the PyCIL template values (`cifar100` / `resnet18_rep`); switch `dataset` and `convnet_type` to your traffic dataset and the transformer backbone before running.
+The traffic datasets follow the ET-Bert preprocessing pipeline (raw PCAP -> per-flow packet-byte token sequences). The traffic vocabulary used by the backbone is provided in `convs/vocab_gen/vocab_packet_4chars_all.txt`.
 
 ## Usage
 
